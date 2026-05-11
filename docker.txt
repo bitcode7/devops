@@ -1,0 +1,438 @@
+# Docker Complete Lab Guide (Ubuntu)
+
+## Step 1 — Update Ubuntu Packages
+
+```bash
+sudo apt update
+```
+
+# Refreshes package list
+
+---
+
+# Step 2 — Install Docker
+
+```bash
+sudo apt install docker.io -y
+```
+
+# Installs Docker Engine
+
+---
+
+# Step 3 — Verify Docker Installation
+
+```bash
+docker --version
+```
+
+# Shows installed Docker version
+
+---
+
+# Step 4 — Start Docker Service
+
+```bash
+sudo systemctl start docker
+```
+
+# Starts Docker service
+
+---
+
+# Step 5 — Enable Docker on Boot
+
+```bash
+sudo systemctl enable docker
+```
+
+# Automatically starts Docker after reboot
+
+---
+
+# Step 6 — Check Docker Status
+
+```bash
+sudo systemctl status docker
+```
+
+# Displays Docker service status
+
+---
+
+# Step 7 — Check Running Containers
+
+```bash
+sudo docker ps
+```
+
+# Shows running containers
+
+---
+
+# Step 8 — Download Nginx Image
+
+```bash
+sudo docker pull nginx
+```
+
+# Downloads nginx image from Docker Hub
+
+---
+
+# Step 9 — View Downloaded Images
+
+```bash
+sudo docker images
+```
+
+# Lists all Docker images
+
+---
+
+# Step 10 — Run Nginx Container
+
+```bash
+sudo docker run -d -p 8000:80 nginx
+```
+
+# Creates nginx container
+# -d → detached/background mode
+# -p → maps laptop port to container port
+
+---
+
+# Step 11 — Open Nginx in Browser
+
+Visit:
+
+```text
+http://localhost:8000
+```
+
+# Opens nginx webpage
+
+---
+
+# Step 12 — View Running Containers
+
+```bash
+sudo docker ps
+```
+
+# Shows active containers
+
+---
+
+# Step 13 — View All Containers
+
+```bash
+sudo docker ps -a
+```
+
+# Shows running + stopped containers
+
+---
+
+# Step 14 — Enter Container Terminal
+
+```bash
+sudo docker exec -it <container_id> sh
+```
+
+# Opens terminal inside container
+# exit → leaves container
+
+---
+
+# Step 15 — Stop Container
+
+```bash
+sudo docker stop <container_id>
+```
+
+# Stops running container
+
+---
+
+# Step 16 — Start Container Again
+
+```bash
+sudo docker start <container_id>
+```
+
+# Restarts stopped container
+
+---
+
+# Step 17 — Remove Container
+
+```bash
+sudo docker rm <container_id>
+```
+
+# Deletes container permanently
+
+---
+
+# Step 18 — Remove Docker Image
+
+```bash
+sudo docker rmi nginx
+```
+
+# Deletes image from system
+
+---
+
+# Step 19 — Create Flask Project Folder
+
+```bash
+cd ~/Documents
+mkdir pythonproject
+cd pythonproject
+```
+
+# Creates project directory
+
+---
+
+# Step 20 — Create Templates Folder
+
+```bash
+mkdir templates
+```
+
+# Creates HTML templates folder
+
+---
+
+# Step 21 — Create Flask App File
+
+```bash
+nano app.py
+```
+
+Add:
+
+```python
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route("/")
+def home_page():
+    return render_template("index.html")
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+```
+
+Save:
+- Ctrl + O
+- Enter
+- Ctrl + X
+
+# Creates Flask application
+
+---
+
+# Step 22 — Create HTML File
+
+```bash
+nano templates/index.html
+```
+
+Add:
+
+```html
+<h1>Welcome to My Flask App!</h1>
+```
+
+Save:
+- Ctrl + O
+- Enter
+- Ctrl + X
+
+# Creates webpage
+
+---
+
+# Step 23 — Create Dockerfile
+
+```bash
+nano Dockerfile
+```
+
+IMPORTANT:
+- filename must be exactly:
+  ```text
+  Dockerfile
+  ```
+- no extension
+
+Add:
+
+```dockerfile
+FROM python:3-alpine3.15
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install flask
+
+CMD ["python3", "app.py"]
+```
+
+Save:
+- Ctrl + O
+- Enter
+- Ctrl + X
+
+# Docker instructions to build custom image
+
+---
+
+# Step 24 — Build Docker Image
+
+```bash
+sudo docker build -t myimage:1 .
+```
+
+# Builds custom Docker image
+# -t → image name/tag
+# . → current folder
+
+---
+
+# Step 25 — View Docker Images
+
+```bash
+sudo docker images
+```
+
+# Shows created image
+
+---
+
+# Step 26 — Run Flask Container
+
+```bash
+sudo docker run -p 8000:5000 myimage:1
+```
+
+# Maps laptop port 8000 → Flask port 5000
+
+---
+
+# Step 27 — Open Flask App
+
+Visit:
+
+```text
+http://127.0.0.1:8000
+```
+
+# Opens Flask webpage
+
+---
+
+# Step 28 — Run Flask App in Background
+
+```bash
+sudo docker run -d -p 8000:5000 myimage:1
+```
+
+# Runs container in detached mode
+
+---
+
+# Step 29 — View Container Logs
+
+```bash
+sudo docker logs <container_id>
+```
+
+# Displays container output/errors
+
+---
+
+# Step 30 — Tag Docker Image
+
+```bash
+sudo docker tag myimage:1 <dockerhub_username>/myimage
+```
+
+Example:
+
+```bash
+sudo docker tag myimage:1 arshaq/myimage
+```
+
+# Prepares image for Docker Hub upload
+
+---
+
+# Step 31 — Login to Docker Hub
+
+```bash
+sudo docker login -u <dockerhub_username>
+```
+
+# Logs into Docker Hub account
+
+---
+
+# Step 32 — Push Image to Docker Hub
+
+```bash
+sudo docker push <dockerhub_username>/myimage
+```
+
+Example:
+
+```bash
+sudo docker push arshaq/myimage
+```
+
+# Uploads image to Docker Hub
+
+---
+
+# Step 33 — Logout from Docker Hub
+
+```bash
+sudo docker logout
+```
+
+# Logs out from Docker Hub
+
+---
+
+# Most Common Docker Workflow
+
+```bash
+sudo docker build -t myimage .
+sudo docker run -p 8000:5000 myimage
+sudo docker ps
+sudo docker stop <id>
+```
+
+# Everyday Docker workflow
+
+---
+
+# Important Docker Concepts
+
+| Concept | Meaning |
+|----------|----------|
+| Image | Blueprint/template |
+| Container | Running instance of image |
+| Dockerfile | Instructions to build image |
+| Docker Hub | Online image repository |
+| Port Mapping | Connect laptop port to container port |
+| Build | Create image |
+| Run | Create/start container |
+
+---
