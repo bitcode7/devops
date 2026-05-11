@@ -1,23 +1,130 @@
-Nginx Monitoring with Prometheus & Grafana (WSL Guide)
+# Nginx Monitoring with Prometheus & Grafana (Ubuntu)
 
-Prerequisites
-Make sure Docker is installed and running in WSL.
-bashdocker --version
-docker compose version
+## Step 1 — Update Ubuntu Packages
 
-If not installed, get Docker Desktop for Windows and enable the WSL 2 backend from its settings. Docker Desktop runs the Docker engine, and WSL talks to it directly.
+```bash
+sudo apt update
+```
 
+# Refreshes Ubuntu package list
 
-Step 1 — Create a Project Folder
-bashmkdir ~/nginx-monitoring && cd ~/nginx-monitoring
+---
 
-Creates a dedicated folder for all your config files and moves into it. All files you create next will live here.
+# Step 2 — Install Required Packages
 
+```bash
+sudo apt install -y ca-certificates curl gnupg
+```
 
-Step 2 — Create the Prometheus Config File
-bashnano prometheus.yml
-Paste this inside:
-yamlglobal:
+# Installs required dependencies
+
+---
+
+# Step 3 — Create Docker Keyrings Directory
+
+```bash
+sudo install -m 0755 -d /etc/apt/keyrings
+```
+
+# Creates secure directory for Docker keys
+
+---
+
+# Step 4 — Download Docker GPG Key
+
+```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+```
+
+# Downloads Docker security key
+
+---
+
+# Step 5 — Add Docker Repository
+
+```bash
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+# Adds official Docker repository to Ubuntu
+
+---
+
+# Step 6 — Update Packages Again
+
+```bash
+sudo apt update
+```
+
+# Refreshes package list including Docker repo
+
+---
+
+# Step 7 — Install Docker + Docker Compose
+
+```bash
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+```
+
+# Installs:
+# - Docker Engine
+# - Docker CLI
+# - Container runtime
+# - Docker Compose plugin
+
+---
+
+# Step 8 — Add User to Docker Group
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+# Allows Docker usage without sudo
+
+---
+
+# Step 9 — Apply Group Changes
+
+```bash
+newgrp docker
+```
+
+# Activates Docker group permissions immediately
+
+---
+
+# Step 10 — Verify Docker Installation
+
+```bash
+docker --version
+```
+
+# Displays Docker version
+
+---
+
+# Step 11 — Create Project Folder
+
+```bash
+mkdir ~/nginx-monitoring
+cd ~/nginx-monitoring
+```
+
+# Creates project directory
+
+---
+
+# Step 12 — Create Prometheus Configuration
+
+```bash
+nano prometheus.yml
+```
+
+Add:
+
+```yaml
+global:
   scrape_interval: 15s
 
 scrape_configs:
@@ -28,15 +135,27 @@ scrape_configs:
   - job_name: "nginx"
     static_configs:
       - targets: ["nginx-exporter:9113"]
-Save with Ctrl+X → Y → Enter
+```
 
-This tells Prometheus to collect (scrape) metrics every 15 seconds — from itself and from the nginx-exporter container. The exporter is what reads Nginx's internal stats and converts them into a format Prometheus understands.
+Save:
+- Ctrl + X
+- Y
+- Enter
 
+# Configures Prometheus scraping targets
 
-Step 3 — Create the Nginx Config File
-bashnano nginx.conf
-Paste this inside:
-nginxevents {}
+---
+
+# Step 13 — Create Nginx Configuration
+
+```bash
+nano nginx.conf
+```
+
+Add:
+
+```nginx
+events {}
 
 http {
   server {
@@ -48,15 +167,27 @@ http {
     }
   }
 }
-Save with Ctrl+X → Y → Enter
+```
 
-Enables the /nginx_status page on Nginx, which shows live stats like active connections and total requests. The nginx-exporter reads this page and feeds the data to Prometheus.
+Save:
+- Ctrl + X
+- Y
+- Enter
 
+# Enables Nginx metrics endpoint
 
-Step 4 — Create the Docker Compose File
-bashnano docker-compose.yml
-Paste this inside:
-yamlversion: '3'
+---
+
+# Step 14 — Create Docker Compose File
+
+```bash
+nano docker-compose.yml
+```
+
+Add:
+
+```yaml
+version: '3'
 
 services:
   prometheus:
@@ -90,22 +221,250 @@ services:
       - "9113:9113"
     depends_on:
       - nginx
-Save with Ctrl+X → Y → Enter
+```
 
-This single file defines all 4 containers:
+Save:
+- Ctrl + X
+- Y
+- Enter
 
-prometheus — collects and stores metrics
-grafana — displays metrics as graphs
-nginx — the web server being monitored
-nginx-exporter — reads Nginx stats and exposes them to Prometheus
+# Defines all monitoring services
 
+---
 
+# Step 15 — Start All Containers
 
-Step 5 — Start All Containers
-bashdocker compose up -d
+```bash
+docker compose up -d
+```
 
--d means "detached" — runs everything in the background. First run will pull Docker images, which takes 1–2 minutes. After that it's instant.
+# Starts:
+# - Prometheus
+# - Grafana
+# - Nginx
+# - Nginx Exporter
 
+---
+
+# Step 16 — Check Running Containers
+
+```bash
+docker compose ps
+```
+
+# Displays running services
+
+---
+
+# Step 17 — View Logs
+
+```bash
+docker compose logs -f
+```
+
+# Displays live container logs
+
+---
+
+# Step 18 — Find Ubuntu IP Address
+
+```bash
+hostname -I
+```
+
+# Displays system IP address
+
+---
+
+# Step 19 — Open Services in Browser
+
+## Prometheus
+
+```text
+http://your-ip:9090
+```
+
+# Opens Prometheus dashboard
+
+---
+
+## Grafana
+
+```text
+http://your-ip:3000
+```
+
+Login:
+
+```text
+Username: admin
+Password: admin
+```
+
+# Opens Grafana dashboard
+
+---
+
+## Nginx
+
+```text
+http://your-ip:80
+```
+
+# Opens Nginx webpage
+
+---
+
+# Step 20 — Connect Grafana to Prometheus
+
+Inside Grafana:
+- Go to:
+  ```text
+  Connections → Data Sources
+  ```
+
+- Click:
+  ```text
+  Add data source
+  ```
+
+- Choose:
+  ```text
+  Prometheus
+  ```
+
+URL:
+
+```text
+http://prometheus:9090
+```
+
+- Click:
+  ```text
+  Save & Test
+  ```
+
+# Connects Grafana with Prometheus
+
+---
+
+# Step 21 — Generate Test Traffic
+
+```bash
+for i in {1..50}; do curl http://localhost & done
+```
+
+# Sends multiple requests to Nginx
+
+---
+
+# Step 22 — Import Grafana Dashboard
+
+Inside Grafana:
+- Go to:
+  ```text
+  Dashboards → New → Import
+  ```
+
+Enter Dashboard ID:
+
+```text
+12708
+```
+
+- Click:
+  ```text
+  Load
+  ```
+
+- Select:
+  ```text
+  Prometheus
+  ```
+
+- Click:
+  ```text
+  Import
+  ```
+
+# Imports Nginx monitoring dashboard
+
+---
+
+# Step 23 — Stop All Containers
+
+```bash
+docker compose down
+```
+
+# Stops and removes all containers
+
+---
+
+# Quick Reference Commands
+
+## Start Containers
+
+```bash
+docker compose up -d
+```
+
+# Starts all services
+
+---
+
+## Stop Containers
+
+```bash
+docker compose down
+```
+
+# Stops all services
+
+---
+
+## Check Status
+
+```bash
+docker compose ps
+```
+
+# Shows running containers
+
+---
+
+## View Logs
+
+```bash
+docker compose logs -f
+```
+
+# Displays live logs
+
+---
+
+## Find System IP
+
+```bash
+hostname -I
+```
+
+# Displays Ubuntu IP address
+
+---
+
+# Important Concepts
+
+| Concept | Meaning |
+|----------|----------|
+| Docker Compose | Runs multiple containers together |
+| Prometheus | Metrics collection system |
+| Grafana | Monitoring dashboard |
+| Nginx Exporter | Converts Nginx stats into Prometheus metrics |
+| scrape_interval | How often Prometheus collects metrics |
+| Dashboard | Visualization panel |
+
+---
 
 Step 6 — Open in Your Browser
 ServiceURLLoginPrometheushttp://localhost:9090none neededGrafanahttp://localhost:3000admin / adminNginxhttp://localhost:80none needed
