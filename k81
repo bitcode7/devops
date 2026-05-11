@@ -1,0 +1,300 @@
+# Kubernetes Basics Lab (Minikube + kubectl) — Ubuntu
+
+## PHASE 1 — INSTALL REQUIRED PACKAGES
+
+### Step 1 — Update Ubuntu Packages
+
+```bash
+sudo apt update
+```
+
+# Refreshes Ubuntu package list
+
+---
+
+### Step 2 — Install Dependencies
+
+```bash
+sudo apt install curl wget apt-transport-https -y
+```
+
+# Installs required packages
+
+---
+
+## PHASE 2 — INSTALL kubectl
+
+### Step 3 — Download kubectl
+
+```bash
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+```
+
+# Downloads latest kubectl binary
+
+---
+
+### Step 4 — Give Execute Permission + Move to System Path
+
+```bash
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+```
+
+# Makes kubectl executable and globally accessible
+
+---
+
+### Step 5 — Verify kubectl Installation
+
+```bash
+kubectl version --client
+```
+
+# Displays kubectl version
+
+---
+
+## PHASE 3 — INSTALL MINIKUBE
+
+### Step 6 — Download Minikube
+
+```bash
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+```
+
+# Downloads Minikube binary
+
+---
+
+### Step 7 — Install Minikube
+
+```bash
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+```
+
+# Installs Minikube globally
+
+---
+
+## PHASE 4 — START DOCKER
+
+### Step 8 — Start Docker
+
+```bash
+sudo systemctl start docker
+```
+
+# Starts Docker service
+
+---
+
+## PHASE 5 — START KUBERNETES CLUSTER
+
+### Step 9 — Start Minikube Cluster
+
+```bash
+minikube start --driver=docker
+```
+
+# Starts local Kubernetes cluster using Docker
+
+---
+
+### Step 10 — Verify Nodes
+
+```bash
+kubectl get nodes
+```
+
+# Displays cluster nodes
+
+---
+
+### Step 11 — Check Minikube Status
+
+```bash
+minikube status
+```
+
+# Displays Minikube cluster status
+
+---
+
+## PHASE 6 — CREATE POD
+
+### Step 12 — Create Nginx Pod
+
+```bash
+kubectl run my-nginx --image=nginx
+```
+
+# Creates nginx Pod
+
+---
+
+### Step 13 — Check Pods
+
+```bash
+kubectl get pods
+```
+
+# Displays pod status
+
+---
+
+### Step 14 — Describe Pod
+
+```bash
+kubectl describe pod my-nginx
+```
+
+# Displays detailed pod information
+
+---
+
+## PHASE 7 — DEBUG POD
+
+### Step 15 — View Pod Logs
+
+```bash
+kubectl logs my-nginx
+```
+
+# Displays container logs
+
+---
+
+## PHASE 8 — EXPOSE POD USING NODEPORT
+
+### Step 16 — Expose Pod
+
+```bash
+kubectl expose pod my-nginx --type=NodePort --port=80
+```
+
+# Creates NodePort service
+
+---
+
+### Step 17 — View Services
+
+```bash
+kubectl get services
+```
+
+# Displays services
+
+---
+
+### Step 18 — Get Browser URL
+
+```bash
+minikube service my-nginx --url
+```
+
+# Displays application access URL
+
+---
+
+## PHASE 9 — CREATE DEPLOYMENT
+
+### Step 19 — Create Deployment
+
+```bash
+kubectl create deployment my-dep --image=nginx --replicas=2
+```
+
+# Creates deployment with 2 replicas
+
+---
+
+### Step 20 — Verify Deployment
+
+```bash
+kubectl get deployments
+```
+
+# Displays deployment status
+
+---
+
+## PHASE 10 — SCALE DEPLOYMENT
+
+### Step 21 — Scale Deployment
+
+```bash
+kubectl scale deployment my-dep --replicas=5
+```
+
+# Scales deployment to 5 replicas
+
+---
+
+### Step 22 — View All Resources
+
+```bash
+kubectl get all
+```
+
+# Displays:
+# - Pods
+# - Services
+# - Deployments
+# - ReplicaSets
+
+---
+
+## PHASE 11 — OPEN DASHBOARD
+
+### Step 23 — Open Kubernetes Dashboard
+
+```bash
+minikube dashboard
+```
+
+# Opens Kubernetes dashboard in browser
+
+---
+
+## PHASE 12 — CLEANUP
+
+### Step 24 — Delete Service
+
+```bash
+kubectl delete service my-nginx
+```
+
+# Deletes service
+
+---
+
+### Step 25 — Delete Deployment
+
+```bash
+kubectl delete deployment my-dep
+```
+
+# Deletes deployment
+
+---
+
+### Step 26 — Delete Pod
+
+```bash
+kubectl delete pod my-nginx
+```
+
+# Deletes Pod
+
+---
+
+### Step 27 — Stop Minikube
+
+```bash
+minikube stop
+```
+
+# Stops Kubernetes cluster
+
+---
