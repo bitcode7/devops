@@ -1,0 +1,329 @@
+# Git Complete Lab Guide (Windows)
+
+## Step 1 — Install Git
+
+Download and install Git:
+
+https://git-scm.com/download/win
+
+After installation open:
+- Git Bash
+OR
+- PowerShell
+
+---
+
+# Check Git Installation
+
+```bash
+git --version
+```
+
+# Shows installed Git version
+
+---
+
+# Configure Git (Permanent / Global)
+
+```bash
+git config --global user.name "Mercedes"
+git config --global user.email "yourmail@bmsce.ac.in"
+```
+
+# Sets username and email for all repositories
+
+---
+
+# Verify Configuration
+
+```bash
+git config --list
+```
+
+# Displays all Git settings
+
+---
+
+# Temporary / Local Configuration
+
+```bash
+git config user.name "TemporaryUser"
+git config user.email "temp@gmail.com"
+```
+
+# Applies only to current repository
+
+---
+
+# Create Project Folder
+
+```bash
+cd %USERPROFILE%\Documents
+mkdir newproject
+cd newproject
+```
+
+# Creates and enters project directory
+
+---
+
+# Create Python File
+
+```bash
+notepad demo.py
+```
+
+Add:
+
+```python
+print("Hello Welcome to my Git")
+```
+
+# Creates Python file
+
+---
+
+# Initialize Git Repository
+
+```bash
+git init
+```
+
+# Converts normal folder into Git repository
+
+---
+
+# Check Repository Status
+
+```bash
+git status
+```
+
+# Shows tracked/untracked/staged files
+
+---
+
+# Add File to Staging Area
+
+```bash
+git add demo.py
+```
+
+OR
+
+```bash
+git add .
+```
+
+# Prepares files for commit
+
+---
+
+# Check Status Again
+
+```bash
+git status
+```
+
+# File should appear under "Changes to be committed"
+
+---
+
+# Create First Commit
+
+```bash
+git commit -m "first commit"
+```
+
+# Saves snapshot of project
+
+---
+
+# View Commit History
+
+```bash
+git log
+```
+
+# Displays all commits
+
+---
+
+# Modify File
+
+```bash
+notepad demo.py
+```
+
+Add:
+
+```python
+print("new stuff added")
+```
+
+# Updates Python file
+
+---
+
+# View Exact Changes
+
+```bash
+git diff
+```
+
+# Shows line-by-line changes
+
+---
+
+# Stage Updated File
+
+```bash
+git add demo.py
+```
+
+# Adds modified file to staging area
+
+---
+
+# Create Second Commit
+
+```bash
+git commit -m "main code"
+```
+
+# Saves updated project snapshot
+
+---
+
+# View Commit History Again
+
+```bash
+git log
+```
+
+# Shows both commits
+
+---
+
+# Connect Local Repo to GitHub
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+```
+
+# Links local project with GitHub repository
+
+---
+
+# Verify Remote Connection
+
+```bash
+git remote -v
+```
+
+# Displays connected GitHub URLs
+
+---
+
+# Check Current Branch
+
+```bash
+git branch
+```
+
+# Shows branch name (main/master)
+
+---
+
+# Push Code to GitHub
+
+If branch is main:
+
+```bash
+git push origin main
+```
+
+If branch is master:
+
+```bash
+git push origin master
+```
+
+# Uploads local commits to GitHub
+
+---
+
+# Pull Latest Changes
+
+If branch is main:
+
+```bash
+git pull origin main
+```
+
+If branch is master:
+
+```bash
+git pull origin master
+```
+
+# Downloads latest GitHub changes
+
+---
+
+# Clone Existing Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+```
+
+# Downloads repository from GitHub
+
+---
+
+# Remove Global Username
+
+```bash
+git config --global --unset user.name
+```
+
+# Deletes global username configuration
+
+---
+
+# Remove Global Email
+
+```bash
+git config --global --unset user.email
+```
+
+# Deletes global email configuration
+
+---
+
+# Most Common Workflow
+
+```bash
+git status
+git add .
+git commit -m "message"
+git push origin main
+```
+
+# Everyday Git workflow
+
+---
+
+# Important Git Concepts
+
+| Concept | Meaning |
+|----------|----------|
+| Repository | Git tracked project |
+| Commit | Saved project snapshot |
+| Staging Area | Files ready for commit |
+| Push | Upload code to GitHub |
+| Pull | Download latest code |
+| Clone | Copy repository |
+| Remote | Online repository |
+
+---
