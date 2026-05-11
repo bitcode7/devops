@@ -1,0 +1,632 @@
+# Kubernetes Complete Lab Guide (Minikube + kubectl) — Ubuntu
+
+## What is Kubernetes?
+
+Kubernetes is a container orchestration platform used to:
+- deploy containers
+- manage containers
+- scale applications
+- auto-heal failed containers
+- expose applications
+
+Docker runs containers.
+
+Kubernetes manages containers.
+
+---
+
+# Kubernetes Architecture
+
+```text
+kubectl
+   ↓
+Kubernetes Cluster
+   ↓
+Node
+   ↓
+Pods
+   ↓
+Containers
+```
+
+---
+
+# Important Concepts
+
+| Concept | Meaning |
+|----------|----------|
+| Cluster | Complete Kubernetes environment |
+| Node | Machine inside cluster |
+| Pod | Smallest deployable unit |
+| Deployment | Manages Pods |
+| Service | Exposes Pods/networking |
+| kubectl | Kubernetes command-line tool |
+| Minikube | Local Kubernetes cluster |
+
+---
+
+# PHASE 1 — INSTALL REQUIRED PACKAGES
+
+## Step 1 — Update Ubuntu Packages
+
+```bash
+sudo apt update
+```
+
+# Refreshes Ubuntu package list
+
+---
+
+## Step 2 — Install Dependencies
+
+```bash
+sudo apt install curl wget apt-transport-https -y
+```
+
+# Installs:
+# - curl
+# - wget
+# - HTTPS transport support
+
+---
+
+# PHASE 2 — INSTALL kubectl
+
+## Step 3 — Download kubectl Binary
+
+```bash
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+```
+
+# Downloads latest kubectl binary
+
+---
+
+## Step 4 — Give Execute Permission
+
+```bash
+chmod +x kubectl
+```
+
+# Makes kubectl executable
+
+---
+
+## Step 5 — Move kubectl to System Path
+
+```bash
+sudo mv kubectl /usr/local/bin/
+```
+
+# Allows kubectl to run globally
+
+---
+
+## Step 6 — Verify kubectl Installation
+
+```bash
+kubectl version --client
+```
+
+# Displays kubectl version
+
+---
+
+# PHASE 3 — INSTALL MINIKUBE
+
+## Step 7 — Download Minikube
+
+```bash
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+```
+
+# Downloads Minikube binary
+
+---
+
+## Step 8 — Install Minikube
+
+```bash
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+```
+
+# Installs Minikube globally
+
+---
+
+## Step 9 — Verify Minikube Installation
+
+```bash
+minikube version
+```
+
+# Displays Minikube version
+
+---
+
+# PHASE 4 — START DOCKER
+
+## Step 10 — Start Docker Service
+
+```bash
+sudo systemctl start docker
+```
+
+# Starts Docker service
+
+---
+
+## Step 11 — Enable Docker on Boot
+
+```bash
+sudo systemctl enable docker
+```
+
+# Automatically starts Docker after reboot
+
+---
+
+## Step 12 — Verify Docker Status
+
+```bash
+sudo systemctl status docker
+```
+
+Expected:
+
+```text
+Active: active (running)
+```
+
+Press:
+
+```text
+Q
+```
+
+to exit.
+
+---
+
+# PHASE 5 — START KUBERNETES CLUSTER
+
+## Step 13 — Start Minikube Cluster
+
+```bash
+minikube start --driver=docker
+```
+
+# Creates local Kubernetes cluster using Docker
+
+---
+
+# Internally Minikube Starts:
+
+- API Server
+- Scheduler
+- Controller Manager
+- etcd
+- kubelet
+
+---
+
+## Step 14 — Verify Cluster
+
+```bash
+kubectl get nodes
+```
+
+Expected:
+
+```text
+minikube   Ready
+```
+
+# Displays cluster nodes
+
+---
+
+# PHASE 6 — CREATE POD
+
+## What is a Pod?
+
+A Pod is the smallest deployable unit in Kubernetes.
+
+Usually:
+- 1 Pod = 1 Container
+
+---
+
+## Step 15 — Create Nginx Pod
+
+```bash
+kubectl run my-nginx --image=nginx
+```
+
+# Creates Pod using nginx image
+
+---
+
+## Step 16 — Check Pod Status
+
+```bash
+kubectl get pods
+```
+
+Initially:
+
+```text
+ContainerCreating
+```
+
+After few seconds:
+
+```text
+Running
+```
+
+# Displays pod status
+
+---
+
+# PHASE 7 — EXPOSE POD USING NODEPORT
+
+## Why Service Needed?
+
+Pods are internal/private.
+
+Service exposes Pods externally.
+
+---
+
+## Step 17 — Expose Pod
+
+```bash
+kubectl expose pod my-nginx --type=NodePort --port=80
+```
+
+# Creates NodePort service
+
+---
+
+## Step 18 — View Services
+
+```bash
+kubectl get services
+```
+
+Example:
+
+```text
+my-nginx   NodePort   80:31261/TCP
+```
+
+# Displays service details
+
+---
+
+## Step 19 — Get Browser URL
+
+```bash
+minikube service my-nginx --url
+```
+
+Example:
+
+```text
+http://192.xxx.xx.xx:xxxxx
+```
+
+Open in browser.
+
+Expected:
+- Nginx welcome page
+
+---
+
+# Traffic Flow
+
+```text
+Browser
+   ↓
+NodePort Service
+   ↓
+Pod
+   ↓
+Nginx Container
+```
+
+---
+
+# PHASE 8 — CREATE DEPLOYMENT
+
+## What is Deployment?
+
+Deployment manages Pods automatically.
+
+Features:
+- scaling
+- auto-healing
+- rolling updates
+
+---
+
+## Step 20 — Create Deployment
+
+```bash
+kubectl create deployment my-dep --image=nginx --replicas=2
+```
+
+# Creates deployment with 2 Pods
+
+---
+
+## Step 21 — Verify Deployment
+
+```bash
+kubectl get deployments
+```
+
+Expected:
+
+```text
+READY   2/2
+```
+
+# Displays deployment status
+
+---
+
+## Step 22 — Verify Pods
+
+```bash
+kubectl get pods
+```
+
+Expected:
+- original nginx pod
+- 2 deployment pods
+
+---
+
+# PHASE 9 — SCALE DEPLOYMENT
+
+## Step 23 — Scale Deployment
+
+```bash
+kubectl scale deployment my-dep --replicas=5
+```
+
+# Scales deployment to 5 Pods
+
+---
+
+## Step 24 — Verify Scaling
+
+```bash
+kubectl get pods
+```
+
+Expected:
+- 5 deployment pods running
+
+---
+
+# Kubernetes Auto Scaling Idea
+
+```text
+Traffic increases
+      ↓
+Increase replicas
+      ↓
+More Pods created
+```
+
+---
+
+# PHASE 10 — VIEW ALL RESOURCES
+
+## Step 25 — View Everything
+
+```bash
+kubectl get all
+```
+
+# Displays:
+# - Pods
+# - Services
+# - Deployments
+# - ReplicaSets
+
+---
+
+# What is ReplicaSet?
+
+ReplicaSet ensures:
+> required number of Pods always exist
+
+Deployment internally manages ReplicaSets.
+
+---
+
+# PHASE 11 — OPEN DASHBOARD
+
+## Step 26 — Open Kubernetes Dashboard
+
+```bash
+minikube dashboard
+```
+
+# Opens graphical Kubernetes dashboard
+
+---
+
+# Dashboard Shows
+
+- Pods
+- Deployments
+- Services
+- Logs
+- Scaling
+- Resource usage
+
+---
+
+# OPTIONAL COMMANDS
+
+## View Pod Logs
+
+```bash
+kubectl logs my-nginx
+```
+
+# Displays container logs
+
+---
+
+## Describe Pod
+
+```bash
+kubectl describe pod my-nginx
+```
+
+# Displays:
+# - events
+# - IP
+# - image
+# - errors
+# - node info
+
+---
+
+## List Nodes
+
+```bash
+kubectl get nodes
+```
+
+# Displays cluster nodes
+
+---
+
+## List Everything
+
+```bash
+kubectl get all
+```
+
+# Displays all cluster resources
+
+---
+
+# PHASE 12 — CLEANUP
+
+## Step 27 — Delete Service
+
+```bash
+kubectl delete service my-nginx
+```
+
+# Deletes service
+
+---
+
+## Step 28 — Delete Deployment
+
+```bash
+kubectl delete deployment my-dep
+```
+
+# Deletes deployment + managed Pods
+
+---
+
+## Step 29 — Delete Pod
+
+```bash
+kubectl delete pod my-nginx
+```
+
+# Deletes standalone pod
+
+---
+
+## Step 30 — Verify Cleanup
+
+```bash
+kubectl get all
+```
+
+Expected:
+- no deployment
+- no nginx pod
+
+---
+
+# PHASE 13 — STOP MINIKUBE
+
+## Step 31 — Stop Cluster
+
+```bash
+minikube stop
+```
+
+# Stops Kubernetes cluster
+
+---
+
+# Final Kubernetes Mental Model
+
+```text
+Docker → runs containers
+
+Pod → wraps containers
+
+Deployment → manages Pods
+
+Service → exposes Pods
+
+kubectl → controls Kubernetes
+
+Minikube → local Kubernetes cluster
+```
+
+---
+
+# Important Viva Questions
+
+## 1. What is kubectl?
+
+kubectl is the command-line tool used to communicate with Kubernetes clusters.
+
+---
+
+## 2. What is Minikube?
+
+Minikube is a local single-node Kubernetes cluster used for learning and testing.
+
+---
+
+## 3. Difference Between Pod and Deployment?
+
+| Pod | Deployment |
+|------|-------------|
+| Runs single app/container | Manages multiple Pods |
+| No auto-healing | Supports auto-healing |
+| Manual scaling | Automatic scaling |
+
+---
+
+## 4. What is NodePort?
+
+NodePort exposes Kubernetes applications externally using a node port.
+
+---
+
+## 5. Which Command Scales Applications?
+
+```bash
+kubectl scale deployment <deployment-name> --replicas=<count>
+```
+
+---
